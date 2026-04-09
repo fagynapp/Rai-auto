@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Lock, MapPin, Clock, ListChecks, FileText, History, Phone, Plus, Trash2, Play, Loader2, Copy, Check, ChevronDown, Info } from 'lucide-react';
+import { Shield, Lock, MapPin, Clock, ListChecks, FileText, History, Phone, Plus, Trash2, Play, Loader2, Copy, Check, ChevronDown, Info, User } from 'lucide-react';
 
 const AREAS: Record<string, { label: string; phone: string }> = {
   '1': { label: 'Área I',   phone: '62 9 9641-4977' },
@@ -83,6 +83,11 @@ export default function App() {
   const [registros, setRegistros] = useState<Registro[]>([{ local: '', horario: '12:00' }]);
   const [selectedNat, setSelectedNat] = useState<Set<string>>(new Set(['patrulhamento', 'estacionamento']));
   const [historico, setHistorico] = useState<HistoricoItem[]>([]);
+  const [identificacao, setIdentificacao] = useState({
+    cmt: { nome: '', cpf: '' },
+    mot: { nome: '', cpf: '' },
+    aux: { nome: '', cpf: '' },
+  });
   
   const [isExecuting, setIsExecuting] = useState(false);
   const [progressPct, setProgressPct] = useState(0);
@@ -92,6 +97,7 @@ export default function App() {
 
   const [openCards, setOpenCards] = useState({
     auth: true,
+    identificacao: true,
     area: true,
     registros: true,
     naturezas: true,
@@ -381,18 +387,65 @@ export default function App() {
                 )}
               </div>
 
-              {/* AREA E VIATURA CARD */}
+              {/* IDENTIFICAÇÃO CARD */}
               <div className="bg-card rounded-[10px] border border-border overflow-hidden">
-                <CardHeader title="Área de atuação e viatura" subtitle="Identificação da equipe" icon={MapPin} cardKey="area" />
-                {openCards.area && (
-                  <div className="p-4 space-y-3">
+                <CardHeader title="Identificação" subtitle="Equipe e viatura" icon={User} cardKey="identificacao" />
+                {openCards.identificacao && (
+                  <div className="p-4 space-y-4">
                     <div>
-                      <label className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.07em] mb-1.5">Área de patrulhamento</label>
+                      <label className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.07em] mb-1.5">Número da viatura</label>
+                      <input 
+                        type="text" 
+                        value={viatura}
+                        onChange={e => setViatura(e.target.value)}
+                        className="w-full h-[34px] border border-border rounded bg-gray-50 text-[12px] text-text-primary px-2.5 outline-none focus:border-blue-mid focus:bg-white transition-all"
+                        placeholder="Ex: 815253" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.07em]">Equipe composta</label>
+                      {(['cmt', 'mot', 'aux'] as const).map((role) => (
+                        <div key={role} className="grid grid-cols-12 gap-2">
+                          <div className="col-span-2 flex items-center justify-center bg-gray-100 rounded text-[11px] font-bold text-text-secondary uppercase">
+                            {role.toUpperCase()}
+                          </div>
+                          <div className="col-span-6">
+                            <input 
+                              type="text" 
+                              placeholder="Nome"
+                              value={identificacao[role].nome}
+                              onChange={e => setIdentificacao(prev => ({ ...prev, [role]: { ...prev[role], nome: e.target.value } }))}
+                              className="w-full h-[34px] border border-border rounded bg-gray-50 text-[12px] text-text-primary px-2.5 outline-none focus:border-blue-mid focus:bg-white transition-all"
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <input 
+                              type="text" 
+                              placeholder="CPF"
+                              value={identificacao[role].cpf}
+                              onChange={e => setIdentificacao(prev => ({ ...prev, [role]: { ...prev[role], cpf: e.target.value } }))}
+                              className="w-full h-[34px] border border-border rounded bg-gray-50 text-[12px] text-text-primary px-2.5 outline-none focus:border-blue-mid focus:bg-white transition-all"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ÁREA DE PATRULHAMENTO */}
+              <div className="bg-card rounded-[10px] border border-border overflow-hidden">
+                <CardHeader title="Área de patrulhamento" subtitle="Local de atuação" icon={MapPin} cardKey="area" />
+                {openCards.area && (
+                  <div className="p-4">
+                    <div>
+                      <label className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.07em] mb-1.5">Área de atuação</label>
                       <div className="relative">
                         <select 
                           value={area}
                           onChange={e => setArea(e.target.value)}
-                          className="w-full h-[38px] border border-border rounded bg-gray-50 text-[13px] text-text-primary px-3 pr-8 outline-none focus:border-blue-mid focus:bg-white focus:ring-[3px] focus:ring-blue-mid/10 transition-all appearance-none cursor-pointer"
+                          className="w-full h-[38px] border border-border rounded bg-gray-50 text-[11px] text-text-primary px-3 pr-8 outline-none focus:border-blue-mid focus:bg-white focus:ring-[3px] focus:ring-blue-mid/10 transition-all appearance-none cursor-pointer"
                         >
                           <option value="">— Selecione a área —</option>
                           <option value="1">Área I — T. Vera Cruz / T. Pe. Pelágio / Est. Anicuns</option>
@@ -409,16 +462,6 @@ export default function App() {
                           <span>{AREAS[area].phone}</span>
                         </div>
                       )}
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.07em] mb-1.5">Número da viatura</label>
-                      <input 
-                        type="text" 
-                        value={viatura}
-                        onChange={e => setViatura(e.target.value)}
-                        className="w-full h-[38px] border border-border rounded bg-gray-50 text-[13px] text-text-primary px-3 outline-none focus:border-blue-mid focus:bg-white focus:ring-[3px] focus:ring-blue-mid/10 transition-all"
-                        placeholder="Ex: 815253" 
-                      />
                     </div>
                   </div>
                 )}
@@ -463,7 +506,7 @@ export default function App() {
                                   <select 
                                     value={r.local}
                                     onChange={e => updateRegistro(i, 'local', e.target.value)}
-                                    className="w-full h-[34px] border border-border rounded bg-gray-50 text-[12px] text-text-primary px-2.5 pr-8 outline-none focus:border-blue-mid focus:bg-white transition-all appearance-none cursor-pointer"
+                                    className="w-full h-[34px] border border-border rounded bg-gray-50 text-[11px] text-text-primary px-2.5 pr-8 outline-none focus:border-blue-mid focus:bg-white transition-all appearance-none cursor-pointer"
                                   >
                                     <option value="">— Selecione o local —</option>
                                     {LOCAIS_GRUPOS.map(g => (
