@@ -57,8 +57,8 @@ const NATUREZAS = [
   { id: 'estacionamento',    label: 'Ponto de estacionamento', relato: 'REALIZA PONTO DE ESTACIONAMENTO POLICIAL MILITAR' },
   { id: 'abordagem-pessoa',  label: 'Abordagem a pessoa',      relato: 'REALIZA ABORDAGEM A PESSOA' },
   { id: 'abordagem-veiculo', label: 'Abordagem a veículo',     relato: 'REALIZA ABORDAGEM A VEÍCULO' },
-  { id: 'apoio',             label: 'Apoio a unidade',         relato: 'REALIZA APOIO A UNIDADE' },
-  { id: 'verificacao',       label: 'Verificação de local',    relato: 'REALIZA VERIFICAÇÃO DE LOCAL' },
+  { id: 'apoio',             label: 'Apoio policial',          relato: 'REALIZA APOIO POLICIAL' },
+  { id: 'verificacao',       label: 'Ordem de Serviço',        relato: 'REALIZA ORDEM DE SERVIÇO' },
 ];
 
 interface Registro {
@@ -687,7 +687,7 @@ export default function App() {
                 <button 
                   onClick={executar}
                   disabled={isExecuting}
-                  className="inline-flex items-center gap-1.5 h-9 px-4 rounded text-[12px] font-medium bg-navy text-white border border-navy hover:bg-blue-dark hover:border-blue-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                  className="inline-flex items-center gap-1.5 h-9 px-4 rounded text-[12px] font-medium bg-gradient-to-r from-green-600 to-green-700 text-white border border-green-700 hover:from-green-700 hover:to-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                 >
                   {isExecuting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                   Executar automação
